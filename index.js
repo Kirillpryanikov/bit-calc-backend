@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -24,6 +25,10 @@ const calculateChance = (coin, stakes, day_reward = 1350) => {
 
 const app = express();
 app.use(bodyParser.json());
+
+app.use(
+    express.static(path.resolve(`${__dirname}/../bit-calc-react/build`))
+);
 
 app.get('/api/currencies', (req, res) => {
     res.send({
@@ -96,4 +101,4 @@ app.post('/api/calculate', async (req, res) => {
     });
 });
 
-app.listen(8000);
+app.listen(8080);
