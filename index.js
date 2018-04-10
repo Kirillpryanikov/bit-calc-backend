@@ -9,19 +9,23 @@ app.get('/api/currencies', (req, res) => {
         currency: [
             {
                 'name': 'USD',
-                'id': 'usd'
+                'id': 'usd',
+                'isCompulsory': true
             },
             {
                 'name': 'EUR',
                 'id': 'eur',
+                'isCompulsory': true
             },
             {
                 'name': 'JPY',
-                'id': 'jpy'
+                'id': 'jpy',
+                'isCompulsory': true
             },
             {
                 'name': 'CNY',
-                'id': 'cny'
+                'id': 'cny',
+                'isCompulsory': true
             }
         ]
     });
