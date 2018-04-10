@@ -90,8 +90,8 @@ app.post('/api/calculate', async (req, res) => {
 
     res.send({
         reward: total_coins - start_coins,
-        total: total_coins * rate.data,
-        inCurrency: total_coins,
+        total: total_coins,
+        inCurrency: total_coins * rate.data,
         graph: graph
     });
 });
