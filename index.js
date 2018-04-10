@@ -75,11 +75,14 @@ app.post('/api/calculate', async (req, res) => {
         date.setMonth(date.getMonth() + 1);
         let diff = parseInt((date - prevDate) / (1000 * 60 * 60 * 24));   
 
+        console.log('prevDate', prevDate);
+        console.log('date', date);
+
         total_coins = total_coins + diff * percent;
         percent = calculateChance(total_coins, stakes_amount);
 
         graph.push({
-            date: date,
+            date: new Date(date),
             tc: total_coins,
             sr: percent
         });
