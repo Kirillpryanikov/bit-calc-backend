@@ -31,9 +31,7 @@ app.use(
     express.static(appDir)
 );
 
-app.get( "*", function( req, res ) {
-    res.sendfile(path.resolve(appDir, "index.html"));
-} );
+
 app.get('/api/currencies', (req, res) => {
     res.send({
         currency: [
