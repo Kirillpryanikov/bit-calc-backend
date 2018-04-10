@@ -15,45 +15,62 @@ app.get('/api/currencies', (req, res) => {
         currency: [
             {
                 'name': 'USD',
-                'id': 'usd',
+                'id': 'USD',
                 'isCompulsory': true
             },
             {
                 'name': 'EUR',
-                'id': 'eur',
+                'id': 'EUR',
                 'isCompulsory': true
             },
             {
                 'name': 'JPY',
-                'id': 'jpy',
+                'id': 'JPY',
                 'isCompulsory': false
             },
             {
                 'name': 'CNY',
-                'id': 'cny',
+                'id': 'CNY',
                 'isCompulsory': false
             }
         ]
     });
 });
 
+axios.interceptors.request.use((config) => {
+    if (config.headers['Content-Type'] && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+      config.transformRequest = (data) => {
+        const str = [];
+        Object.keys(data).forEach(key => str.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`));
+        return str.join('&');
+      };
+    }
+
+    return config;
+  }, error => Promise.reject(error));
+
 app.post('/api/calculate', async (req, res) => {
-    let total_coins = req.body.coins;
-    let start_coins = req.body.coins;
+    let total_coins = parseFloat(req.body.coins);
+    let start_coins = total_coins;
 
     const bay_info_response = await axios.get('https://chainz.cryptoid.info/explorer/index.data.dws?coin=bay&n=10');
     const block_id = bay_info_response.data.blocks[0].out;
     const stakes_info_response = await axios.get(`https://chainz.cryptoid.info/explorer/index.stakes.dws?coin=bay&${block_id}.js`);
     const stakes_amount = stakes_info_response.data.stakes.reduce((summ, curr) => summ + curr.amount, 0);
     
+    const rate = await axios.post('https://currencio.co/rate.php', 
+        {from: 'BAY', to: req.body.currency}, 
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'} }
+    );
+
     let percent = calculateChance(total_coins, stakes_amount);
     const graph = [];
-    
+
     let date = new Date(); let prevDate;
     date.setHours(0); date.setMinutes(0); 
     date.setSeconds(0); date.setMilliseconds(0);
     
-    for (let i = 0; i < req.body.period; i++) {
+    for (let i = 0; i < parseInt(req.body.period); i++) {
         prevDate = new Date(date);
         date.setMonth(date.getMonth() + 1);
         let diff = parseInt((date - prevDate) / (1000 * 60 * 60 * 24));   
@@ -70,8 +87,8 @@ app.post('/api/calculate', async (req, res) => {
 
     res.send({
         reward: total_coins - start_coins,
-        total: total_coins,
-        inCurrency: 0,
+        total: total_coins * rate.data,
+        inCurrency: total_coins,
         graph: graph
     });
 });
