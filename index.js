@@ -25,7 +25,7 @@ const calculateChance = (coin, stakes, day_reward = 1350) => {
 const app = express();
 app.use(bodyParser.json());
 
-const appDir = path.resolve(`${__dirname}/../bit-calc-react/build`)
+const appDir = path.resolve(`${__dirname}/bit-calc-react/build`)
 
 app.use(
     express.static(appDir)
