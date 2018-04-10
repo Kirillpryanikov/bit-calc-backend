@@ -2,13 +2,28 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
-const app = express();
-app.use(bodyParser.json());
+// Workaround to fix 'application/x-www-form-urlencoded' in axios
+axios.interceptors.request.use((config) => {
+    if (config.headers['Content-Type'] && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+      config.transformRequest = (data) => {
+        const str = [];
+        Object.keys(data).forEach(key => str.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`));
+        return str.join('&');
+      };
+    }
+
+    return config;
+  }, error => Promise.reject(error));
 
 
+// Calculate chance to get block today
 const calculateChance = (coin, stakes, day_reward = 1350) => {
     return coin / stakes * day_reward;
 }
+
+
+const app = express();
+app.use(bodyParser.json());
 
 app.get('/api/currencies', (req, res) => {
     res.send({
@@ -37,18 +52,6 @@ app.get('/api/currencies', (req, res) => {
     });
 });
 
-axios.interceptors.request.use((config) => {
-    if (config.headers['Content-Type'] && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-      config.transformRequest = (data) => {
-        const str = [];
-        Object.keys(data).forEach(key => str.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`));
-        return str.join('&');
-      };
-    }
-
-    return config;
-  }, error => Promise.reject(error));
-
 app.post('/api/calculate', async (req, res) => {
     let total_coins = parseFloat(req.body.coins);
     let start_coins = total_coins;
@@ -74,9 +77,6 @@ app.post('/api/calculate', async (req, res) => {
         prevDate = new Date(date);
         date.setMonth(date.getMonth() + 1);
         let diff = parseInt((date - prevDate) / (1000 * 60 * 60 * 24));   
-
-        console.log('prevDate', prevDate);
-        console.log('date', date);
 
         total_coins = total_coins + diff * percent;
         percent = calculateChance(total_coins, stakes_amount);
