@@ -22,14 +22,18 @@ const calculateChance = (coin, stakes, day_reward = 1350) => {
     return coin / stakes * day_reward;
 }
 
-
 const app = express();
 app.use(bodyParser.json());
 
+const appDir = path.resolve(`${__dirname}/../bit-calc-react/build`)
+
 app.use(
-    express.static(path.resolve(`${__dirname}/../bit-calc-react/build`))
+    express.static(appDir)
 );
 
+app.get( "*", function( req, res ) {
+    res.sendfile(path.resolve(appDir, "index.html"));
+} );
 app.get('/api/currencies', (req, res) => {
     res.send({
         currency: [
