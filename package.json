@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start:prod": "pm2 start index.js",
-    "stop:prod": "pm2 delete index.js"
+    "start:prod": "pm2 start index.js --name bitbay_backend",
+    "restart:prod": "pm2 restart bitbay_backend",
+    "stop:prod": "pm2 delete bitbay_backend"
   },
   "author": "",
   "license": "ISC",
