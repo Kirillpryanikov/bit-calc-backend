@@ -18,7 +18,7 @@ axios.interceptors.request.use((config) => {
 
 
 // Calculate chance to get block today
-const calculateChance = (coin, stakes, day_reward = 1350) => {
+const calculateChance = (coin, stakes, day_reward = 1350 * 8) => {
     return coin / stakes * day_reward;
 }
 
